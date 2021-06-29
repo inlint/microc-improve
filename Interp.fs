@@ -254,6 +254,17 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
                 store2 //退出循环返回 环境store2
 
         loop store
+    | For(e1, e2, e3, body) ->                    
+        let (i, store1) = eval e1 locEnv gloEnv store
+        let rec loop store1 =
+            let (v, store3) = eval e2 locEnv gloEnv store1
+            if v<>0 then 
+                let store4 = exec body locEnv gloEnv store3
+                let (j,store5) = eval e3 locEnv gloEnv store4
+                loop store5
+            else 
+                store3
+        loop store1
 
     | Expr e ->
         // _ 表示丢弃e的值,返回 变更后的环境store1
@@ -290,6 +301,12 @@ and eval e locEnv gloEnv store : int * store =
         let (loc, store1) = access acc locEnv gloEnv store
         let (res, store2) = eval e locEnv gloEnv store1
         (res, setSto store2 loc res)
+    | PreInc acc     -> let (loc, store1) = access acc locEnv gloEnv store
+                        let tmp = getSto store1 loc
+                        (tmp + 1, setSto store1 loc (tmp + 1)) 
+    | PreDec acc     -> let (loc, store1) = access acc locEnv gloEnv store
+                        let tmp = getSto store1 loc
+                        (tmp - 1, setSto store1 loc (tmp - 1)) 
     | CstI i -> (i, store)
     | Addr acc -> access acc locEnv gloEnv store
     | Prim1 (ope, e1) ->
