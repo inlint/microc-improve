@@ -18,7 +18,8 @@ type typ =
                                                                    
 and expr =                           // 表达式，右值       
   | PreInc of access                 
-  | PreDec of access                                         
+  | PreDec of access
+  | AssignPrim of string *access * expr                                            
   | Access of access                 (* x    or  *p    or  a[e]     *) //访问左值（右值）
   | Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
   | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
@@ -46,6 +47,7 @@ and stmt =
 
 and stmtordec =                                                    
   | Dec of typ * string              (* Local variable declaration  *)
+  | DecWithAssign of  typ * string * expr
   | Stmt of stmt                     (* A statement                 *)
 
 // 顶级声明 可以是函数声明或变量声明
